@@ -1,0 +1,248 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from Tkinter import *
+import tkFileDialog
+import os
+import shutil
+import fnmatch
+import tkSimpleDialog
+import subprocess
+#------------------------------------------------------------------------------------
+#MÉTODOS
+
+#Selecciona la direccion del entry seleccionado por el usuario
+def seleccionarDir(): 
+	carpeta = tkFileDialog.askdirectory(title='Escoge directorio de trabajo')
+	directorio.configure(state="normal")
+	directorio.delete(0,END)
+	directorio.insert(0,carpeta)
+	directorio.configure(state="disable") #Ponemos su estado en desabilitado para evitar que el usuario no pueda modificarlo en panatalla.
+	#carpeta = path absoluto de la carpeta seleccionada
+
+#Metodo para ....	
+def obrir():
+	path = directorio.get()
+	archivo = archivos.get()
+	lista.delete("0.0", END)
+	for line in open(path + "/" + archivo,'r+'):
+	   lista.insert(END,line)
+	   
+#Metodo para guardar un fichero
+def guardar():
+	path = directorio.get()
+	archivo = archivos.get()
+	content = lista.get("0.0", END)
+	print "contingut" + content
+	pa = path+"/"+archivo
+	subprocess.call('echo "{}" > {}'.format(content,pa), shell=True)
+	
+
+#------------------------------------------------------------------------------------			
+
+#Creacion de la ventana principal MAIN
+ventana=Tk()
+ventana.title("Execució d'escripts en el temps")
+ventana.minsize(600,600)
+
+#------------------------------------------------------------------------------------
+
+#Creacion de los frames principales (Arriba, medio, abajo)
+
+#Frame 1
+f1=Frame()
+f1.configure()
+f1.pack(side=TOP,fill=X)
+
+#Frame 2
+f2=Frame()
+f2.configure()
+f2.pack(side=TOP, fill=X)
+
+#Frame 3
+f3=Frame()
+f3.configure()
+f3.pack(side=TOP,fill=X)
+
+#Frame 4
+f4=Frame()
+f4.configure()
+f4.pack(expand=TRUE,fill=BOTH,side=TOP)
+
+#Frame 5
+f5=Frame()
+f5.configure()
+f5.pack(side=BOTTOM,fill=X)
+
+#Frame 6
+f6=Frame()
+f6.configure()
+f6.pack(side=BOTTOM,fill=X)
+
+#Frame 7
+f7=Frame()
+f7.configure()
+f7.pack(side=BOTTOM,fill=X)
+
+#Frame 8
+f8=Frame()
+f8.configure()
+f8.pack(side=BOTTOM,fill=X)
+
+#Frame 9
+f9=Frame()
+f9.configure()
+f9.pack(side=BOTTOM,fill=X)
+
+#Frame 10
+f10=Frame()
+f10.configure()
+f10.pack(side=BOTTOM,fill=X)
+
+
+
+#-----------------------------------------------------------------------------------
+#definición de los botones del frame 1
+f11=Frame(f1)
+f11.pack(fill=X)
+
+#Boton 1, escoger directorio de trabajo
+cd=Button(f11,text='Escoger directorio de trabajo', command=seleccionarDir)#añadir el comand de la acción
+cd.pack(side=LEFT)
+directorio=Entry(f11)
+directorio.configure(state="disable")
+directorio.pack(side=LEFT,expand=TRUE,fill=X)
+
+#-----------------------------------------------------------------------------------
+#definición de los botones del frame 2
+f21=Frame(f2)
+f21.pack(fill=X)
+
+archivos=Entry(f21)
+archivos.configure()
+archivos.insert(0,'hola.sh')
+
+#Boton 21, abrir un script
+obrir=Button(f21, text='Obrir Script',command=obrir)#añadir command
+obrir.pack(side=LEFT)
+
+archivos.pack(side=LEFT,expand=TRUE,fill=X)
+
+#Boton 22, guardar cambios
+guardar=Button(f21, text='Guardar Script', command = guardar)#añadir command
+guardar.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#definición de los botones del frame 3
+f31=Frame(f3)
+f31.pack(fill=X)
+
+#Boton 3, guardar copia en un script nou
+nou=Button(f31, text='Guardar en un nou script')#añadir command
+nou.pack(side=LEFT)
+
+
+#-----------------------------------------------------------------------------------
+#Configuracion de la lista y scrollbar. 4
+scroll = Scrollbar(f4,orient=VERTICAL)
+lista = Text(f4,xscrollcommand=scroll.set)
+scroll.config(command=lista.yview)
+scroll.pack(side=RIGHT,fill=Y)
+lista.pack(side=TOP,expand=TRUE,fill=BOTH, anchor=W)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 5, guardar copia en un script nou
+sortir=Button(f5, text='Sortir', command=quit)#añadir command
+sortir.pack(side=LEFT)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 6, guardar copia en un script nou
+run3=Button(f6, text='Run')#añadir command
+run3.pack(side=RIGHT)
+ejecutarC1=Label(f6,text='  HH:MM  ') 
+ejecutarC1.pack(side=RIGHT)
+
+min6=Entry(f6,width=2)
+min6.configure()
+min6.insert(0,'')
+min6.pack(side=RIGHT,expand=FALSE)
+
+ejecutarC2=Label(f6,text=' : ') 
+ejecutarC2.pack(side=RIGHT)
+
+hora6=Entry(f6,width=2)
+hora6.configure()
+hora6.insert(0,'')
+hora6.pack(side=RIGHT)
+
+ejecutarC3=Label(f6,text='Programa cada dia a les ') 
+ejecutarC3.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 7, guardar copia en un script nou
+run2=Button(f7, text='Run')#añadir command
+run2.pack(side=RIGHT)
+
+ejecutarA1=Label(f7,text='  HH:MM  ') 
+ejecutarA1.pack(side=RIGHT)
+
+min7=Entry(f7,width=2)
+min7.configure()
+min7.insert(0,'')
+min7.pack(side=RIGHT,expand=FALSE)
+
+ejecutarA2=Label(f7,text=' : ') 
+ejecutarA2.pack(side=RIGHT)
+
+hora7=Entry(f7,width=2)
+hora7.configure()
+hora7.insert(0,'')
+hora7.pack(side=RIGHT)
+
+ejecutarA3=Label(f7,text='Executa un cop a les ') 
+ejecutarA3.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 8, guardar copia en un script nou
+run1=Button(f8, text='Run')#añadir command
+run1.pack(side=RIGHT)
+ejecutarI=Label(f8,text='Executa immediatament') #falta meter el comand del boton para Añadir funcionalidad
+ejecutarI.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 91, guardar copia en un script nou
+verstderr=Button(f9, text='Veure Stderr')#añadir command
+verstderr.pack(side=RIGHT)
+
+#Boton 92, guardar copia en un script nou
+verstdout=Button(f9, text='Veure Stdout')#añadir command
+verstdout.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#Label f10
+input1=Label(f10,text="Arguments d'entrada: ") 
+input1.pack(side=LEFT)
+
+#Entrada argumento
+argumentos=Entry(f10)
+argumentos.configure()
+argumentos.insert(0,'Alibaba')
+argumentos.pack(side=LEFT,expand=TRUE,fill=X)
+
+err=IntVar()
+Checkbutton(f10, text="Genera Stderr", variable=err).pack(side=RIGHT)
+out = IntVar()
+Checkbutton(f10, text="Genera Stdrout", variable=out).pack(side=RIGHT)
+
+
+
+
+
+ventana.mainloop()
