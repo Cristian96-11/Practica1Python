@@ -11,7 +11,7 @@ import subprocess
 #------------------------------------------------------------------------------------
 #MÉTODOS
 
-#Selecciona la direccion del entry seleccionado por el usuario
+#Selecciona la direccion del entry seleccionado por el usuario FUNCIONAL
 def seleccionarDir(): 
 	carpeta = tkFileDialog.askdirectory(title='Escoge directorio de trabajo')
 	directorio.configure(state="normal")
@@ -20,7 +20,7 @@ def seleccionarDir():
 	directorio.configure(state="disable") #Ponemos su estado en desabilitado para evitar que el usuario no pueda modificarlo en panatalla.
 	#carpeta = path absoluto de la carpeta seleccionada
 
-#Metodo para ....	
+#Metodo para ....	FUNCIONAL
 def obrir():
 	path = directorio.get()
 	archivo = archivos.get()
@@ -28,14 +28,62 @@ def obrir():
 	for line in open(path + "/" + archivo,'r+'):
 	   lista.insert(END,line)
 	   
-#Metodo para guardar un fichero
-def guardar():
+#Metodo para guardar un fichero FUNCIONAL
+def guardar(archivo):
 	path = directorio.get()
-	archivo = archivos.get()
 	content = lista.get("0.0", END)
-	print "contingut" + content
 	pa = path+"/"+archivo
 	subprocess.call('echo "{}" > {}'.format(content,pa), shell=True)
+	
+	
+def guardarS():
+	guardar(archivos.get())
+	
+
+def guardarN():
+	guardar("a")
+	
+	
+def gstderr(): #fUNCIIONAL
+	path = directorio.get()
+	archivo = archivos.get()
+	script = path+"/"+archivo
+	archivo = archivo[:-3]
+	pa = path+"/"+archivo+".err"
+	print pa
+	subprocess.call('{} 2> {}'.format(script,pa), shell=True)
+
+
+def gstdout():	#FUNCIONAL
+	path = directorio.get()
+	archivo = archivos.get()
+	script = path+"/"+archivo
+	archivo = archivo[:-3]
+	pa = path+"/"+archivo+".err"
+	print pa
+	subprocess.call('{} > {}'.format(script,pa), shell=True)
+	
+	
+def runn():
+	path = directorio.get()
+	archivo = archivos.get()
+	script = path+"/"+archivo
+	archivo = archivo[:-3]
+	if out.get():
+	   script += " > "+path+"/"+archivo+".out"	
+	   print script
+	if err.get():
+	   script = script+"2>"+path+"/"+archivo+".err"
+	   print script
+	#subprocess.call('{} > {}'.format(script,pa), shell=True)
+	
+
+def vstderr():
+	print "to do"
+
+
+def vstdout():
+	print "to do"	   
 	
 
 #------------------------------------------------------------------------------------			
@@ -123,14 +171,14 @@ archivos.configure()
 archivos.insert(0,'hola.sh')
 
 #Boton 21, abrir un script
-obrir=Button(f21, text='Obrir Script',command=obrir)#añadir command
+obrir=Button(f21, text='Obrir Script',command=obrir)
 obrir.pack(side=LEFT)
 
 archivos.pack(side=LEFT,expand=TRUE,fill=X)
 
 #Boton 22, guardar cambios
-guardar=Button(f21, text='Guardar Script', command = guardar)#añadir command
-guardar.pack(side=RIGHT)
+guarda=Button(f21, text='Guardar Script', command=guardarS)
+guarda.pack(side=RIGHT)
 
 
 #-----------------------------------------------------------------------------------
@@ -139,7 +187,7 @@ f31=Frame(f3)
 f31.pack(fill=X)
 
 #Boton 3, guardar copia en un script nou
-nou=Button(f31, text='Guardar en un nou script')#añadir command
+nou=Button(f31, text='Guardar en un nou script', command=guardarN)#añadir command
 nou.pack(side=LEFT)
 
 
@@ -209,7 +257,7 @@ ejecutarA3.pack(side=RIGHT)
 
 #-----------------------------------------------------------------------------------
 #Boton 8, guardar copia en un script nou
-run1=Button(f8, text='Run')#añadir command
+run1=Button(f8, text='Run', command=runn)#añadir command
 run1.pack(side=RIGHT)
 ejecutarI=Label(f8,text='Executa immediatament') #falta meter el comand del boton para Añadir funcionalidad
 ejecutarI.pack(side=RIGHT)
@@ -217,11 +265,11 @@ ejecutarI.pack(side=RIGHT)
 
 #-----------------------------------------------------------------------------------
 #Boton 91, guardar copia en un script nou
-verstderr=Button(f9, text='Veure Stderr')#añadir command
+verstderr=Button(f9, text='Veure Stderr', command=vstderr)#añadir command
 verstderr.pack(side=RIGHT)
 
 #Boton 92, guardar copia en un script nou
-verstdout=Button(f9, text='Veure Stdout')#añadir command
+verstdout=Button(f9, text='Veure Stdout', command=vstdout)#añadir command
 verstdout.pack(side=RIGHT)
 
 
@@ -237,12 +285,18 @@ argumentos.insert(0,'Alibaba')
 argumentos.pack(side=LEFT,expand=TRUE,fill=X)
 
 err=IntVar()
-Checkbutton(f10, text="Genera Stderr", variable=err).pack(side=RIGHT)
+error = Checkbutton(f10, text="Genera Stderr", variable=err).pack(side=RIGHT)
 out = IntVar()
-Checkbutton(f10, text="Genera Stdrout", variable=out).pack(side=RIGHT)
+salida = Checkbutton(f10, text="Genera Stdrout", variable=out).pack(side=RIGHT)
 
 
 
 
 
 ventana.mainloop()
+
+
+## canviar .sh
+#at
+#crontab
+#std
