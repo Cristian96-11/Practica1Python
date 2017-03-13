@@ -11,6 +11,8 @@ import subprocess
 #------------------------------------------------------------------------------------
 #MÉTODOS
 
+inicio = False
+
 #Selecciona la direccion del entry seleccionado por el usuario FUNCIONAL
 def seleccionarDir(): 
 	carpeta = tkFileDialog.askdirectory(title='Escoge directorio de trabajo')
@@ -19,14 +21,32 @@ def seleccionarDir():
 	directorio.insert(0,carpeta)
 	directorio.configure(state="disable") #Ponemos su estado en desabilitado para evitar que el usuario no pueda modificarlo en panatalla.
 	#carpeta = path absoluto de la carpeta seleccionada
+	incio = True
+
+def mensajeConfirmacion():
+	verr=Tk()
+	verr.title("Error")
+	verr.minsize(300,50)
+	mensajeboton=Label(verr,text="Debes introducir un directorio primero")
+	mensajeboton.pack(side=TOP) 
+	confirm = Button(verr, text='Escollir directori', command=seleccionarDir)
+	confirm.pack(side=BOTTOM)
+	
 
 #Metodo para ....	FUNCIONAL
-def obrir():
-	path = directorio.get()
-	archivo = archivos.get()
-	lista.delete("0.0", END)
-	for line in open(path + "/" + archivo,'r+'):
-	   lista.insert(END,line)
+def obrirG(archivo):
+	if (inicio):
+		path = directorio.get()
+		f = open(path + "/" + archivo,'r+')
+		lista.delete("0.0", END)
+		for line in f:
+			lista.insert(END,line)
+	else:
+		mensajeConfirmacion()
+	
+def obrirS():
+	obrirG(archivos.get())
+	
 	   
 #Metodo para guardar un fichero FUNCIONAL
 def guardar(archivo):
@@ -41,16 +61,16 @@ def guardarS():
 	
 
 def guardarN():
-	guardar("a")
+	nombre=tkSimpleDialog.askstring("Guardar en un nou script","Nom del fitxer")
+	guardar(nombre)
 	
 	
-def gstderr(): #fUNCIIONAL
+def gstderr(): #FUNCIONAL
 	path = directorio.get()
 	archivo = archivos.get()
 	script = path+"/"+archivo
 	archivo = archivo[:-3]
 	pa = path+"/"+archivo+".err"
-	print pa
 	subprocess.call('{} 2> {}'.format(script,pa), shell=True)
 
 
@@ -60,31 +80,33 @@ def gstdout():	#FUNCIONAL
 	script = path+"/"+archivo
 	archivo = archivo[:-3]
 	pa = path+"/"+archivo+".err"
-	print pa
 	subprocess.call('{} > {}'.format(script,pa), shell=True)
 	
 	
 def runn():
 	path = directorio.get()
 	archivo = archivos.get()
-	script = path+"/"+archivo
+	script = path+"/"+archivo+" "+argumentos.get()
 	archivo = archivo[:-3]
 	if out.get():
 	   script += " > "+path+"/"+archivo+".out"	
-	   print script
 	if err.get():
-	   script = script+"2>"+path+"/"+archivo+".err"
-	   print script
-	#subprocess.call('{} > {}'.format(script,pa), shell=True)
+	   script = script+" 2> "+path+"/"+archivo+".err"
+	subprocess.call('{}'.format(script), shell=True)
 	
 
 def vstderr():
-	print "to do"
+	archivo = archivos.get()
+	archivo = archivo[:-3]
+	archivo += ".err"
+	obrirG(archivo)
 
 
 def vstdout():
-	print "to do"	   
-	
+	archivo = archivos.get()
+	archivo = archivo[:-3]
+	archivo += ".out"
+	obrirG(archivo)
 
 #------------------------------------------------------------------------------------			
 
@@ -171,7 +193,7 @@ archivos.configure()
 archivos.insert(0,'hola.sh')
 
 #Boton 21, abrir un script
-obrir=Button(f21, text='Obrir Script',command=obrir)
+obrir=Button(f21, text='Obrir Script',command=obrirS)
 obrir.pack(side=LEFT)
 
 archivos.pack(side=LEFT,expand=TRUE,fill=X)
@@ -281,7 +303,7 @@ input1.pack(side=LEFT)
 #Entrada argumento
 argumentos=Entry(f10)
 argumentos.configure()
-argumentos.insert(0,'Alibaba')
+argumentos.insert(0,'')
 argumentos.pack(side=LEFT,expand=TRUE,fill=X)
 
 err=IntVar()
@@ -296,7 +318,8 @@ salida = Checkbutton(f10, text="Genera Stdrout", variable=out).pack(side=RIGHT)
 ventana.mainloop()
 
 
-## canviar .sh
 #at
 #crontab
 #std
+#guardar el nombre del script nuevo a guardar
+#guardar los argumentos de entrada
