@@ -11,25 +11,31 @@ import subprocess
 #------------------------------------------------------------------------------------
 #MÉTODOS
 
+global inicio
 inicio = False
+global arch
+
+#la variable no se actualiza!!!
 
 #Selecciona la direccion del entry seleccionado por el usuario FUNCIONAL
 def seleccionarDir(): 
-	carpeta = tkFileDialog.askdirectory(title='Escoge directorio de trabajo')
+	carpeta = tkFileDialog.askdirectory(title='Escollir directori de traball')
 	directorio.configure(state="normal")
 	directorio.delete(0,END)
 	directorio.insert(0,carpeta)
 	directorio.configure(state="disable") #Ponemos su estado en desabilitado para evitar que el usuario no pueda modificarlo en panatalla.
 	#carpeta = path absoluto de la carpeta seleccionada
-	incio = True
-
+	global inicio
+	inicio = True
+	
+	
 def mensajeConfirmacion():
 	verr=Tk()
 	verr.title("Error")
 	verr.minsize(300,50)
-	mensajeboton=Label(verr,text="Debes introducir un directorio primero")
+	mensajeboton=Label(verr,text="Primer s'ha d'introduir el directori")
 	mensajeboton.pack(side=TOP) 
-	confirm = Button(verr, text='Escollir directori', command=seleccionarDir)
+	confirm = Button(verr, text="OK", command=verr.destroy)
 	confirm.pack(side=BOTTOM)
 	
 
@@ -41,27 +47,42 @@ def obrirG(archivo):
 		lista.delete("0.0", END)
 		for line in f:
 			lista.insert(END,line)
+		global arch
+		arch = archivo
 	else:
 		mensajeConfirmacion()
 	
 def obrirS():
+	archivo = archivos.get()
+	if (archivo[-3:] != '.sh'):
+		archivos.insert(END,'.sh')
 	obrirG(archivos.get())
 	
 	   
 #Metodo para guardar un fichero FUNCIONAL
 def guardar(archivo):
-	path = directorio.get()
-	content = lista.get("0.0", END)
-	pa = path+"/"+archivo
-	subprocess.call('echo "{}" > {}'.format(content,pa), shell=True)
-	
+	if(inicio):
+		path = directorio.get()
+		content = lista.get("0.0", END)
+		pa = path+"/"+archivo
+		subprocess.call('echo "{}" > {}'.format(content,pa), shell=True)
+	else:
+		mensajeConfirmacion()
 	
 def guardarS():
-	guardar(archivos.get())
+	global arch
+	print arch
+	archivos.delete(0,END)
+	archivos.insert(0,arch)
+	guardar(arch)
 	
 
 def guardarN():
-	nombre=tkSimpleDialog.askstring("Guardar en un nou script","Nom del fitxer")
+	aux = True
+	while (aux):
+	   nombre=tkSimpleDialog.askstring("Guardar en un nou script '.sh'","Nom del fitxer")
+	   if (nombre[-3:] == '.sh'):
+		  aux = False 
 	guardar(nombre)
 	
 	
@@ -71,7 +92,9 @@ def gstderr(): #FUNCIONAL
 	script = path+"/"+archivo
 	archivo = archivo[:-3]
 	pa = path+"/"+archivo+".err"
+	pa.delete(0,END)#prueba de limpieza
 	subprocess.call('{} 2> {}'.format(script,pa), shell=True)
+	
 
 
 def gstdout():	#FUNCIONAL
@@ -79,7 +102,8 @@ def gstdout():	#FUNCIONAL
 	archivo = archivos.get()
 	script = path+"/"+archivo
 	archivo = archivo[:-3]
-	pa = path+"/"+archivo+".err"
+	pa = path+"/"+archivo+".out"
+	pa.delete(0,END)#prueba de limpieza
 	subprocess.call('{} > {}'.format(script,pa), shell=True)
 	
 	
@@ -107,6 +131,45 @@ def vstdout():
 	archivo = archivo[:-3]
 	archivo += ".out"
 	obrirG(archivo)
+	
+
+def attime():
+	path=directorio.get()
+	archivo=archivos.get()
+	horaa=hora7.get() 
+	if (horaa[2]==':'):
+		#&& ((hora[0]<'2' && hora[0]>='0' && hora[1]<='9') || (hora[0]=='2' && hora[1]<'4')) && hora[1]>='0' && (hora[3]<'6' && hora[3]>='0' && hora[4]<='9' && hora[4]>='0'): #comprobar hora bien introducida
+		print horaa
+	comanda='/tmp/'+horaa
+	subprocess.call("echo 'rm {}' > {}".format(comanda, comanda),shell=True)
+	
+	if (False):
+		linea=len(open(comanda).readlines())
+    #else:
+		linea=1
+		subprocess.call("echo 'rm {}' > {}".format(comanda, comanda), shell=True)
+	comanda2=path+'/'+archivo
+	if out.get():
+		comanda2=comanda2+" > "+comanda2[:-3]+".out"
+	if err.get():
+		comanda2=comanda2+" 2> "+comanda2[:-3]+".err"
+	comanda2="sed -i '1i "+comanda2+"'"
+	print comanda2
+	print comanda
+	subprocess.call("{} {}".format(comanda2,comanda), shell=True)#Problema con maquina virtual???
+	
+def crontime():
+	path=directorio.get()
+	archivo=archivos.get()
+	minuto=min6.get()
+	horaa=hora6.get() 
+	comanda=minuto+" "+horaa+" * * * "+path+"/"+archivo
+	print comanda
+	
+	
+	
+	
+	
 
 #------------------------------------------------------------------------------------			
 
@@ -139,35 +202,46 @@ f4=Frame()
 f4.configure()
 f4.pack(expand=TRUE,fill=BOTH,side=TOP)
 
-#Frame 5
-f5=Frame()
-f5.configure()
-f5.pack(side=BOTTOM,fill=X)
-
-#Frame 6
-f6=Frame()
-f6.configure()
-f6.pack(side=BOTTOM,fill=X)
-
-#Frame 7
-f7=Frame()
-f7.configure()
-f7.pack(side=BOTTOM,fill=X)
-
-#Frame 8
-f8=Frame()
-f8.configure()
-f8.pack(side=BOTTOM,fill=X)
-
-#Frame 9
-f9=Frame()
-f9.configure()
-f9.pack(side=BOTTOM,fill=X)
+#Frame 50
+f50=Frame()
+f50.configure()
+f50.pack(side=BOTTOM,fill=X)
 
 #Frame 10
-f10=Frame()
+f10=Frame(f50)
 f10.configure()
-f10.pack(side=BOTTOM,fill=X)
+f10.pack(side=TOP,fill=X)
+
+#Frame 9
+f9=Frame(f50)
+f9.configure()
+f9.pack(side=TOP,fill=X)
+
+#Frame 8
+f8=Frame(f50)
+f8.configure()
+f8.pack(side=TOP,fill=X)
+
+#Frame 79
+f79=Frame(f50)
+f79.configure()
+f79.pack(side=TOP,fill=X)
+
+#Frame 7
+f7=Frame(f50)
+f7.configure()
+f7.pack(side=TOP,fill=X)
+
+#Frame 6
+f6=Frame(f50)
+f6.configure()
+f6.pack(side=TOP,fill=X)
+
+#Frame 5
+f5=Frame(f50)
+f5.configure()
+f5.pack(side=TOP,fill=X)
+
 
 
 
@@ -177,7 +251,7 @@ f11=Frame(f1)
 f11.pack(fill=X)
 
 #Boton 1, escoger directorio de trabajo
-cd=Button(f11,text='Escoger directorio de trabajo', command=seleccionarDir)#añadir el comand de la acción
+cd=Button(f11,text='Escollir directori de traball', command=seleccionarDir)#añadir el comand de la acción
 cd.pack(side=LEFT)
 directorio=Entry(f11)
 directorio.configure(state="disable")
@@ -230,47 +304,51 @@ sortir.pack(side=LEFT)
 
 #-----------------------------------------------------------------------------------
 #Boton 6, guardar copia en un script nou
-run3=Button(f6, text='Run')#añadir command
+run3=Button(f6, text='Run', command=crontime)#añadir command
 run3.pack(side=RIGHT)
 ejecutarC1=Label(f6,text='  HH:MM  ') 
 ejecutarC1.pack(side=RIGHT)
 
 min6=Entry(f6,width=2)
 min6.configure()
-min6.insert(0,'')
+min6.insert(0,'*')
 min6.pack(side=RIGHT,expand=FALSE)
-
-ejecutarC2=Label(f6,text=' : ') 
-ejecutarC2.pack(side=RIGHT)
 
 hora6=Entry(f6,width=2)
 hora6.configure()
-hora6.insert(0,'')
+hora6.insert(0,'*')
 hora6.pack(side=RIGHT)
+
+dm6=Entry(f6,width=2)
+dm6.configure()
+dm6.insert(0,'*')
+dm6.pack(side=RIGHT)
+
+mes6=Entry(f6,width=2)
+mes6.configure()
+mes6.insert(0,'*')
+mes6.pack(side=RIGHT)
+
+ds6=Entry(f6,width=2)
+ds6.configure()
+ds6.insert(0,'*')
+ds6.pack(side=RIGHT)
 
 ejecutarC3=Label(f6,text='Programa cada dia a les ') 
 ejecutarC3.pack(side=RIGHT)
 
 
 #-----------------------------------------------------------------------------------
-#Boton 7, guardar copia en un script nou
-run2=Button(f7, text='Run')#añadir command
+#Boton 7, run at
+run2=Button(f7, text='Run', command=attime)
 run2.pack(side=RIGHT)
 
 ejecutarA1=Label(f7,text='  HH:MM  ') 
 ejecutarA1.pack(side=RIGHT)
 
-min7=Entry(f7,width=2)
-min7.configure()
-min7.insert(0,'')
-min7.pack(side=RIGHT,expand=FALSE)
-
-ejecutarA2=Label(f7,text=' : ') 
-ejecutarA2.pack(side=RIGHT)
-
-hora7=Entry(f7,width=2)
+hora7=Entry(f7,width=8)
 hora7.configure()
-hora7.insert(0,'')
+hora7.insert(0,'HH:MM')
 hora7.pack(side=RIGHT)
 
 ejecutarA3=Label(f7,text='Executa un cop a les ') 
@@ -278,7 +356,24 @@ ejecutarA3.pack(side=RIGHT)
 
 
 #-----------------------------------------------------------------------------------
-#Boton 8, guardar copia en un script nou
+#Boton 79, run at
+run4=Button(f79, text='Run', command=attime)
+run4.pack(side=RIGHT)
+
+ejecutarA1=Label(f79,text='  segons  ') 
+ejecutarA1.pack(side=RIGHT)
+
+seg79=Entry(f79,width=5)
+seg79.configure()
+seg79.insert(0,'')
+seg79.pack(side=RIGHT,expand=FALSE)
+
+ejecutarA3=Label(f79,text="Executa d'aquí a ") 
+ejecutarA3.pack(side=RIGHT)
+
+
+#-----------------------------------------------------------------------------------
+#Boton 8, run
 run1=Button(f8, text='Run', command=runn)#añadir command
 run1.pack(side=RIGHT)
 ejecutarI=Label(f8,text='Executa immediatament') #falta meter el comand del boton para Añadir funcionalidad
@@ -286,11 +381,11 @@ ejecutarI.pack(side=RIGHT)
 
 
 #-----------------------------------------------------------------------------------
-#Boton 91, guardar copia en un script nou
+#Boton 91, ver stderr
 verstderr=Button(f9, text='Veure Stderr', command=vstderr)#añadir command
 verstderr.pack(side=RIGHT)
 
-#Boton 92, guardar copia en un script nou
+#Boton 92, ver stdout
 verstdout=Button(f9, text='Veure Stdout', command=vstdout)#añadir command
 verstdout.pack(side=RIGHT)
 
@@ -318,8 +413,8 @@ salida = Checkbutton(f10, text="Genera Stdrout", variable=out).pack(side=RIGHT)
 ventana.mainloop()
 
 
-#at
+#at +-
 #crontab
 #std
-#guardar el nombre del script nuevo a guardar
-#guardar los argumentos de entrada
+#controlar los argumentos de entrada
+#no such file or directory
